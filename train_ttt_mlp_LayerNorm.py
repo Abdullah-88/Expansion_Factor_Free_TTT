@@ -10,10 +10,9 @@ from ttt_mlp_LayerNorm import TTTM
 
 
 transform = Compose([
-RandomCrop(32, padding=4),
-RandomHorizontalFlip(), 
+ 
 ToTensor(),
-Normalize((0.5, 0.5,0.5),(0.5, 0.5,0.5))
+Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 
 ])
 
