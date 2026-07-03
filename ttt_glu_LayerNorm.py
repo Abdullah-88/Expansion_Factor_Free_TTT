@@ -3,7 +3,6 @@ from torch import nn, Tensor
 
 
 
-
      
 class GatingUnit(nn.Module):
     def __init__(self,dim):
