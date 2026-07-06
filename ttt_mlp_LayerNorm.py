@@ -1,9 +1,5 @@
 import torch
 from torch import nn, Tensor
-
-
-
-
      
 class MLP(nn.Module):
 
@@ -12,18 +8,15 @@ class MLP(nn.Module):
         self.proj_1 =  nn.Linear(dim,dim,bias=False)
         self.proj_2 =  nn.Linear(dim,dim,bias=False)        
         self.gelu = nn.GELU()
-       
-             	   
+                    	   
     def forward(self, x):
        
         x = self.proj_1(x)
         x = self.gelu(x)          
         x = self.proj_2(x)
-        
-                          
+                                  
         return x
         
-
 class LocalMappingUnit(nn.Module):
     def __init__(self,dim):
         super().__init__()
@@ -31,37 +24,24 @@ class LocalMappingUnit(nn.Module):
         self.pre_norm = nn.LayerNorm(dim,elementwise_affine=False) 
       
         self.mapping = MLP(dim)
-      
-             	   
+                   	   
     def forward(self, x):
     
         x = self.pre_norm(x)      
         x = self.mapping(x)    
       
-
         return x
-
-
-
-   
-    
 
 class TTT(nn.Module):
    
-
     def __init__(self, dim: int):
         super(TTT, self).__init__()
-       
-     
-
-       
+              
         self.mapping = MLP(dim)
         self.state =  nn.Linear(dim,dim,bias=False)
         self.probe =  nn.Linear(dim,dim,bias=False)
-        
-       
+               
     def forward(self, in_seq: Tensor) -> Tensor:
-
        
         outs = []
         
@@ -83,44 +63,28 @@ class TTT(nn.Module):
         
         return out
         
-
-
-    	
-
 class GlobalMappingUnit(nn.Module):
     def __init__(self,dim):
         super().__init__()
-        
-             
+                     
         self.pre_norm = nn.LayerNorm(dim,elementwise_affine=False) 
         
         self.ttt = TTT(dim)       
-        
-              
-                                      	   
+                                              	   
     def forward(self, x):
     
         x = self.pre_norm(x)       
         x = self.ttt(x)
      
-
         return x         
-
-
-
 
 class TTTBlock(nn.Module):
     def __init__(self, d_model):
         super().__init__()
-       
-         
+               
         self.local_mapping = LocalMappingUnit(d_model)
         self.global_mapping = GlobalMappingUnit(d_model)
-        
-    
-        
-        
-        
+                
     def forward(self, x):
                   
         residual = x
@@ -132,14 +96,10 @@ class TTTBlock(nn.Module):
         residual = x
         
         x = self.local_mapping(x)
-        
-                                          
+                                                  
         out = x + residual
-        
-        
+                
         return out
-
-
 
 class TTTM(nn.Module):
     def __init__(self, d_model, num_layers):
@@ -152,9 +112,3 @@ class TTTM(nn.Module):
     def forward(self, x):
        
         return self.model(x)
-
-
-
-
-
-
