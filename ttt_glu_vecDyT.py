@@ -13,11 +13,11 @@ class VectorDynamicTanh(nn.Module):
         return x
      
 class GatingUnit(nn.Module):
-    def __init__(self,dim):
+    def __init__(self, dim):
         super().__init__()
-        self.proj_1 =  nn.Linear(dim,dim,bias=False)
-        self.proj_2 =  nn.Linear(dim,dim,bias=False)
-        self.proj_3 = nn.Linear(dim,dim,bias=False)     
+        self.proj_1 = nn.Linear(dim, dim, bias = False)
+        self.proj_2 = nn.Linear(dim, dim, bias = False)
+        self.proj_3 = nn.Linear(dim, dim, bias = False)     
         self.gelu = nn.GELU()
                     	   
     def forward(self, x):
@@ -33,7 +33,7 @@ class GatingUnit(nn.Module):
         return out
         
 class LocalMappingUnit(nn.Module):
-    def __init__(self,dim):
+    def __init__(self, dim):
         super().__init__()
         
         self.pre_norm = VectorDynamicTanh(dim)
@@ -53,8 +53,8 @@ class TTT(nn.Module):
         super(TTT, self).__init__()
               
         self.mapping = GatingUnit(dim)
-        self.state =  nn.Linear(dim,dim,bias=False)
-        self.probe =  nn.Linear(dim,dim,bias=False)
+        self.state = nn.Linear(dim, dim, bias = False)
+        self.probe = nn.Linear(dim, dim, bias = False)
                
     def forward(self, in_seq: Tensor) -> Tensor:
        
@@ -67,19 +67,19 @@ class TTT(nn.Module):
             label_view = state
             loss = nn.functional.mse_loss(self.mapping(train_view), label_view)
             grads = torch.autograd.grad(
-                loss, self.mapping.parameters(),create_graph=True)
+                loss, self.mapping.parameters(), create_graph = True)
             with torch.no_grad():
                 for param, grad in zip(self.mapping.parameters(), grads):
               
                     param -= 0.01 * grad
             readout = self.mapping(self.probe(in_seq[:,seq,:])).detach()
             outs.append(readout)
-        out = torch.stack(outs, dim=1)
+        out = torch.stack(outs, dim = 1)
         
         return out
         
 class GlobalMappingUnit(nn.Module):
-    def __init__(self,dim):
+    def __init__(self, dim):
         super().__init__()
                      
         self.pre_norm = VectorDynamicTanh(dim)
